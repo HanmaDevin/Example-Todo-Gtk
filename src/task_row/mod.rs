@@ -1,8 +1,8 @@
 mod imp;
 
 use glib::Object;
-use gtk::prelude::*;
-use gtk::subclass::prelude::*;
+use adw::prelude::*;
+use adw::subclass::prelude::*;
 use gtk::{glib, pango};
 use pango::{AttrInt, AttrList};
 

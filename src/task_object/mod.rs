@@ -2,7 +2,7 @@ mod imp;
 
 use glib::Object;
 use gtk::glib;
-use gtk::subclass::prelude::*;
+use adw::subclass::prelude::*;
 use serde::{Deserialize, Serialize};
 
 // ANCHOR: glib_wrapper_and_new

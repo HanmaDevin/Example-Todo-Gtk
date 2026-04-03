@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 
 use glib::Binding;
-use gtk::subclass::prelude::*;
+use adw::subclass::prelude::*;
 use gtk::{CheckButton, CompositeTemplate, Label, glib};
 
 // ANCHOR: struct_and_subclass
@@ -27,6 +27,7 @@ impl ObjectSubclass for TaskRow {
 
     fn class_init(klass: &mut Self::Class) {
         klass.bind_template();
+        klass.set_css_name("task-row");
     }
 
     fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {

@@ -1,11 +1,11 @@
 use std::cell::{OnceCell, RefCell};
 use std::fs::File;
 
+use adw::prelude::ListModelExtManual;
+use adw::subclass::prelude::*;
 use glib::subclass::InitializingObject;
 use gtk::gio::Settings;
-use gtk::prelude::ListModelExtManual;
-use gtk::subclass::prelude::*;
-use gtk::{CompositeTemplate, Entry, ListView, gio, glib};
+use gtk::{CompositeTemplate, Entry, ListBox, gio, glib};
 
 use crate::task_object::{TaskData, TaskObject};
 use crate::utils::data_path;
@@ -18,7 +18,7 @@ pub struct Window {
     #[template_child]
     pub entry: TemplateChild<Entry>,
     #[template_child]
-    pub tasks_list: TemplateChild<ListView>,
+    pub tasks_list: TemplateChild<ListBox>,
     pub tasks: RefCell<Option<gio::ListStore>>,
     pub settings: OnceCell<Settings>,
 }
@@ -59,7 +59,6 @@ impl ObjectImpl for Window {
         obj.setup_tasks();
         obj.restore_data();
         obj.setup_callbacks();
-        obj.setup_factory();
         obj.setup_actions();
     }
 }
