@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <schemalist>
-  <schema id="org.gtk_rs.Todo1" path="/org/gtk_rs/Todo1/">
+  <schema id="org.gtk_rs.todo" path="/org/gtk_rs/todo/">
     <key name="filter" type="s">
       <choices>
         <choice value='All' />

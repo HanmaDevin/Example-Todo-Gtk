@@ -1,31 +1,29 @@
+mod collection_object;
+mod config;
 mod task_object;
 mod task_row;
 mod utils;
 mod window;
 
 use adw::prelude::{GtkApplicationExt, GtkWindowExt, WidgetExt};
-use gtk::gdk::Display;
 use gtk::gio::prelude::{ActionMapExtManual, ApplicationExt, ApplicationExtManual};
 use gtk::gio::{ActionEntry, SimpleActionGroup};
 use gtk::glib::clone;
-use gtk::{CssProvider, gio, glib};
+use gtk::{gio, glib};
 
+use crate::config::app_id;
 use crate::window::Window;
-
-const APP_ID: &str = "org.gtk_rs.Todo1";
 
 // ANCHOR: main
 fn main() -> glib::ExitCode {
-    // Register and include resources
-    gio::resources_register_include!("gresources").expect("Failed to register resources.");
+    // Load resources from installed location
+    let res = gio::Resource::load(config::resources_file()).expect("Could not load gresource file");
+    gio::resources_register(&res);
 
     // Create a new application
-    let app = adw::Application::builder().application_id(APP_ID).build();
+    let app = adw::Application::builder().application_id(app_id()).build();
 
-    app.connect_startup(|app| {
-        setup_shortcuts(app);
-        load_css()
-    });
+    app.connect_startup(setup_shortcuts);
     // Connect to "activate" signal of `app`
     app.connect_activate(build_ui);
 
@@ -37,19 +35,6 @@ fn setup_shortcuts(app: &adw::Application) {
     app.set_accels_for_action("win.filter('All')", &["<Ctrl>a"]);
     app.set_accels_for_action("win.filter('Open')", &["<Ctrl>o"]);
     app.set_accels_for_action("win.filter('Done')", &["<Ctrl>d"]);
-}
-
-fn load_css() {
-    // Load the CSS file and add it to the provider
-    let provider = CssProvider::new();
-    provider.load_from_resource("/org/gtk_rs/Todo1/style.css");
-
-    // Add the provider to the default screen
-    gtk::style_context_add_provider_for_display(
-        &Display::default().expect("Could not connect to a display."),
-        &provider,
-        gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
-    );
 }
 
 fn build_ui(app: &adw::Application) {
