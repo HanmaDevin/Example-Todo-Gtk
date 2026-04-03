@@ -21,3 +21,14 @@ sudo apt install libgtk-4-dev libadwaita-1-dev meson desktop-file-utils gcc gtk-
 ```bash
 sudo pacman -S gtk4 libadwaita meson desktop-file-utils gcc
 ```
+
+## Build & Install
+
+```bash
+meson setup builddir
+meson install -C builddir
+```
+
+```bash
+todo
+```
