@@ -1,8 +1,14 @@
-use std::cell::RefCell;
+use std::cell::{OnceCell, RefCell};
+use std::fs::File;
 
 use glib::subclass::InitializingObject;
+use gtk::gio::Settings;
+use gtk::prelude::ListModelExtManual;
 use gtk::subclass::prelude::*;
 use gtk::{CompositeTemplate, Entry, ListView, gio, glib};
+
+use crate::task_object::{TaskData, TaskObject};
+use crate::utils::data_path;
 
 // ANCHOR: struct_and_subclass
 // Object holding the state
@@ -14,6 +20,7 @@ pub struct Window {
     #[template_child]
     pub tasks_list: TemplateChild<ListView>,
     pub tasks: RefCell<Option<gio::ListStore>>,
+    pub settings: OnceCell<Settings>,
 }
 
 // The central trait for subclassing a GObject
@@ -26,6 +33,11 @@ impl ObjectSubclass for Window {
 
     fn class_init(klass: &mut Self::Class) {
         klass.bind_template();
+
+        // Create action to remove done tasks and add to action group "win"
+        klass.install_action("win.remove-done-tasks", None, |window, _, _| {
+            window.remove_done_tasks();
+        });
     }
 
     fn instance_init(obj: &InitializingObject<Self>) {
@@ -43,9 +55,12 @@ impl ObjectImpl for Window {
 
         // Setup
         let obj = self.obj();
+        obj.setup_settings();
         obj.setup_tasks();
+        obj.restore_data();
         obj.setup_callbacks();
         obj.setup_factory();
+        obj.setup_actions();
     }
 }
 // ANCHOR_END: constructed
@@ -54,7 +69,26 @@ impl ObjectImpl for Window {
 impl WidgetImpl for Window {}
 
 // Trait shared by all windows
-impl WindowImpl for Window {}
+impl WindowImpl for Window {
+    fn close_request(&self) -> glib::Propagation {
+        // Store task data in vector
+        let backup_data: Vec<TaskData> = self
+            .obj()
+            .tasks()
+            .iter::<TaskObject>()
+            .filter_map(Result::ok)
+            .map(|task_object| task_object.task_data())
+            .collect();
+
+        // Save state to file
+        let file = File::create(data_path()).expect("Could not create json file.");
+        serde_json::to_writer_pretty(file, &backup_data)
+            .expect("Could not write data to json file");
+
+        // Pass close request on to the parent
+        self.parent_close_request()
+    }
+}
 
 // Trait shared by all application windows
 impl ApplicationWindowImpl for Window {}
