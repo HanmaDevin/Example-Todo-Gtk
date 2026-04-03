@@ -24,10 +24,14 @@ sudo pacman -S gtk4 libadwaita meson desktop-file-utils gcc
 
 ## Build & Install
 
+Build and install the application
+
 ```bash
 meson setup builddir
 meson install -C builddir
 ```
+
+Run it
 
 ```bash
 todo
